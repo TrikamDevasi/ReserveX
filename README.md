@@ -85,6 +85,142 @@ Records important actions, the affected booking/resource, actor information, a d
 
 Historical records should be preserved. Resources with booking history should generally be deactivated rather than hard-deleted.
 
+## Recommended project structure
+
+ReserveX uses a feature-oriented structure inside the Next.js App Router. Route files stay focused on page composition and HTTP handling; reusable UI, business logic, database models, and validation are kept in separate modules.
+
+```text
+ReserveX/
+├── public/
+│   ├── images/
+│   └── icons/
+├── src/
+│   ├── app/
+│   │   ├── (platform)/
+│   │   │   ├── dashboard/
+│   │   │   │   └── page.tsx
+│   │   │   ├── resources/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [resourceId]/
+│   │   │   │       └── page.tsx
+│   │   │   ├── bookings/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [bookingId]/
+│   │   │   │       └── page.tsx
+│   │   │   ├── requests/
+│   │   │   │   └── page.tsx
+│   │   │   ├── calendar/
+│   │   │   │   └── page.tsx
+│   │   │   ├── inventory/
+│   │   │   │   └── page.tsx
+│   │   │   ├── issue-return/
+│   │   │   │   └── page.tsx
+│   │   │   ├── analytics/
+│   │   │   │   └── page.tsx
+│   │   │   ├── activity/
+│   │   │   │   └── page.tsx
+│   │   │   └── layout.tsx
+│   │   ├── api/
+│   │   │   ├── resources/
+│   │   │   │   ├── route.ts
+│   │   │   │   └── [resourceId]/
+│   │   │   │       ├── route.ts
+│   │   │   │       └── availability/
+│   │   │   │           └── route.ts
+│   │   │   ├── bookings/
+│   │   │   │   ├── route.ts
+│   │   │   │   └── [bookingId]/
+│   │   │   │       ├── route.ts
+│   │   │   │       ├── approve/
+│   │   │   │       │   └── route.ts
+│   │   │   │       ├── reject/
+│   │   │   │       │   └── route.ts
+│   │   │   │       ├── cancel/
+│   │   │   │       │   └── route.ts
+│   │   │   │       ├── issue/
+│   │   │   │       │   └── route.ts
+│   │   │   │       └── return/
+│   │   │   │           └── route.ts
+│   │   │   ├── dashboard/
+│   │   │   │   └── route.ts
+│   │   │   ├── analytics/
+│   │   │   │   └── route.ts
+│   │   │   └── activity/
+│   │   │       └── route.ts
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── components/
+│   │   ├── ui/
+│   │   ├── layout/
+│   │   ├── resources/
+│   │   ├── bookings/
+│   │   ├── inventory/
+│   │   ├── dashboard/
+│   │   └── shared/
+│   ├── lib/
+│   │   ├── db/
+│   │   │   └── mongoose.ts
+│   │   ├── utils.ts
+│   │   ├── constants.ts
+│   │   └── date-time.ts
+│   ├── models/
+│   │   ├── Resource.ts
+│   │   ├── Booking.ts
+│   │   └── ActivityLog.ts
+│   ├── services/
+│   │   ├── resource.service.ts
+│   │   ├── availability.service.ts
+│   │   ├── booking.service.ts
+│   │   ├── inventory.service.ts
+│   │   └── analytics.service.ts
+│   ├── validations/
+│   │   ├── resource.schema.ts
+│   │   └── booking.schema.ts
+│   ├── types/
+│   │   ├── resource.ts
+│   │   ├── booking.ts
+│   │   └── api.ts
+│   └── hooks/
+├── tests/
+│   ├── unit/
+│   └── integration/
+├── .env.example
+├── .env.local                 # local only; never commit
+├── .gitignore
+├── next.config.ts
+├── package.json
+├── tsconfig.json
+└── README.md
+```
+
+### Folder responsibilities
+
+| Folder | Responsibility |
+| --- | --- |
+| `src/app/` | App Router pages, layouts, loading/error UI, and Route Handlers |
+| `src/app/api/` | HTTP request parsing, validation, service invocation, and response mapping |
+| `src/components/` | Reusable UI grouped by shared purpose or product feature |
+| `src/lib/db/` | Mongoose connection setup and database infrastructure |
+| `src/models/` | Mongoose schemas and model definitions |
+| `src/services/` | Booking rules, availability calculations, inventory operations, and business workflows |
+| `src/validations/` | Zod schemas for validating incoming data |
+| `src/types/` | Shared TypeScript domain and API types |
+| `src/hooks/` | Reusable client-side React hooks |
+| `tests/` | Unit and integration tests for critical workflows |
+| `public/` | Static assets served directly by Next.js |
+
+### Architecture rules
+
+- Keep business rules out of React components and Route Handler files; put them in `services/`.
+- Route Handlers should validate input, call a service, and return a consistent HTTP response.
+- Keep database access in models and service-layer operations; do not connect to MongoDB from client components.
+- Use `server-only` for modules that must never enter the client bundle, especially database and secret-dependent code.
+- Use Zod schemas at API boundaries and infer TypeScript types where practical.
+- Keep resource availability derived from overlapping Approved and Issued bookings; do not store a manually maintained available-quantity value.
+- Use MongoDB transactions for approval operations that must atomically recheck capacity, update the booking, and write an activity log. Configure Atlas as a replica set.
+- Add folders and files as the corresponding milestone is implemented. This is the target structure, not a claim that every file already exists in the repository.
+
 ## Getting started
 
 ### Prerequisites
