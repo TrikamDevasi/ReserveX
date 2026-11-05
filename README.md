@@ -1,93 +1,225 @@
-# ReserveX
+# ReserveX — Equipment & Resource Booking System
 
-A campus resource and equipment booking platform built to help students, faculty, and campus managers discover shared resources, request bookings, manage approvals, and track equipment issue and return workflows.
+An equipment and resource management platform built to help colleges, laboratories, offices, and organizations share and track equipment and facilities—eliminating double bookings, providing real-time availability, and managing the complete reservation, issue, and return lifecycle.
 
-> **Project status:** In development  
-> **Project type:** B.Tech Semester 3 academic project
+> **Project Status:** In Development  
+> **Project Type:** B.Tech Semester 3 Academic Project
 
-## Overview
+---
 
-Colleges and universities share equipment and facilities such as projectors, cameras, microphones, lab kits, sports equipment, and meeting spaces. When requests and handovers are managed informally, availability becomes unclear, double-bookings happen, and equipment returns are difficult to track.
+## 📌 Problem Statement
 
-ReserveX brings these workflows into one place. It is designed around the complete resource lifecycle:
+Colleges, laboratories, offices, and organizations share equipment and resources such as cameras, projectors, laptops, meeting rooms, laboratory instruments, and sports equipment.
 
-**Discover → Check availability → Request → Approve → Issue → Return → Review history**
+When bookings are managed manually (via spreadsheets, logbooks, or verbal requests), users face persistent challenges:
+- **Double bookings & scheduling conflicts** due to lack of real-time synchronization.
+- **Unclear availability**, making planning events, classes, or research experiments difficult.
+- **Lost tracking of issued and returned equipment**, leading to unaccounted inventory, missing accessories, or unchecked damage.
 
-## Core features
+**ReserveX** addresses this by providing an end-to-end resource booking platform where users can browse resources, check availability for specific dates/times, and track reservations, while resource managers can manage inventory, process booking requests, record handovers and returns, and monitor resource utilization.
 
-- **Resource catalogue:** Browse resources by category, location, and status.
-- **Availability checking:** Check capacity for a selected time range before submitting a request.
-- **Booking requests:** Submit a request with purpose, quantity, and requested dates/times.
-- **Approval workflow:** Managers can approve or reject pending requests with an optional note.
-- **Booking management:** View booking status and cancel eligible bookings.
-- **Issue and return tracking:** Record physical handover, expected return, actual return, and item condition.
-- **Inventory management:** Maintain resource details and quantities while preserving historical booking records.
-- **Activity history:** Keep a traceable record of important booking and inventory actions.
-- **Overview and analytics:** Surface operational information such as pending requests, active issues, overdue returns, and resource usage.
+---
 
-Features will be delivered incrementally. Optional enhancements such as QR-based lookup and notifications are not prerequisites for the core booking workflow.
+## 🎯 Expected Outcome
 
-## Booking lifecycle
+- **For Requesters (Students, Faculty, Staff):**
+  - Discover resources across categories and locations.
+  - Verify live availability before booking.
+  - Submit booking requests with specified purpose, time slots, and quantities.
+  - Track reservation status (Pending, Approved, Rejected, Cancelled, Completed) with unique booking references.
+
+- **For Resource Managers (Lab Technicians, Facilities, Admins):**
+  - Manage inventory catalog and define availability.
+  - Review incoming requests, detect scheduling conflicts, and approve/reject with contextual notes.
+  - Record physical check-outs (issue) and check-ins (return), logging item condition.
+  - Monitor overdue returns, track usage history, and review utilization analytics.
+
+---
+
+## 🚀 Core Features
+
+### 1. Resource Management
+- **CRUD Operations:** Add, view, update, and remove resources.
+- **Resource Details:** Store name, description, category, images, location, and usage instructions.
+- **Capacity & Inventory:** Define total quantity available and toggle availability state.
+- **Discovery:** Fast search and multi-facet filtering by category and physical location.
+
+### 2. Availability Management
+- **Date & Time Range Selection:** Specify exact start and end timestamps.
+- **Dynamic Availability Engine:** Display available resources and remaining quantities for the selected period.
+- **Conflict Prevention:** Strict calculation prevents overlapping bookings from exceeding total inventory capacity.
+- **Visual Slots:** Clearly indicate fully booked dates or unavailable time windows.
+
+### 3. Booking Requests
+- **Request Submission:** Submit requests specifying purpose, date range, and required quantity.
+- **Unique Booking Reference:** Automatically generate human-readable, unique identifiers for each reservation (e.g., `RES-2026-XXXX`).
+- **Status Lifecycle:** Track states: `Pending`, `Approved`, `Rejected`, `Cancelled`, and `Completed`.
+- **Self-Service Cancellation:** Allow users to cancel eligible pending or approved reservations before the start time.
+- **Booking History:** Detailed view of past and upcoming reservations for each user.
+
+### 4. Booking Management
+- **Approval Queue:** Centralized dashboard for managers to review incoming requests.
+- **Decision Workflow:** Approve or reject requests with audit notes and feedback.
+- **Calendar & List Views:** View bookings across daily, weekly, or monthly calendar grids and tabular lists.
+- **Conflict Detection:** Highlight conflicting requests and overlapping demands during review.
+- **Active Tracker:** Live view of resources currently issued vs. returned.
+
+### 5. Return & Usage Tracking
+- **Handovers:** Record issue and actual return timestamps.
+- **Condition Logging:** Record item condition upon return (e.g., *Good*, *Minor Wear*, *Damaged*, *Needs Maintenance*).
+- **Overdue Tracking:** Automatically flag and highlight items overdue for return.
+- **Historical Audit Trail:** Maintain complete usage records per resource and user.
+- **Real-Time Restocking:** Automatically release capacity back to available inventory once returned.
+
+### 6. Dashboard & Analytics
+- **Live Metrics:** Total inventory, currently booked/issued resources, and available stock.
+- **Actionable Alerts:** Count of pending approval requests and overdue returns requiring attention.
+- **Resource Insights:** Identify top frequently booked resources and high-demand categories.
+- **Utilization Trends:** Breakdown of booking volume by category and date ranges.
+
+---
+
+## 🌟 Optional Enhancements
+
+- **QR Code Generation:** Generate scannable QR codes for booking references.
+- **QR Handover Scanning:** Scan booking reference QR codes with mobile devices for rapid equipment issue and return.
+- **Notifications:** Automated approval, rejection, and due-date reminder emails.
+- **Smart Rescheduling:** Suggest alternative available time slots or similar resources when a request conflicts.
+- **Utilization Reporting:** Exportable PDF/CSV reports on equipment downtime, usage frequency, and department allocations.
+
+---
+
+## 🚫 Scope & Restrictions
+
+- **No Online Payments:** Rental charges, security deposits, and online payment gateway integrations are out of scope.
+- **No Physical Hardware Integration:** Physical smart locks, IoT lockers, and automated RFID gates are not required.
+- **Core Priority:** High-fidelity availability calculation, conflict prevention, approval workflows, and reliable issue/return tracking.
+
+---
+
+## 🔄 Booking Lifecycle State Machine
 
 ```text
-Pending
-  ├── Approved
-  │     ├── Issued
-  │     │     └── Completed
-  │     └── Cancelled
-  ├── Rejected
-  └── Cancelled
+[Pending]
+   │
+   ├──► [Approved]
+   │       │
+   │       ├──► [Issued] (Physical handover recorded)
+   │       │       │
+   │       │       └──► [Completed] (Returned & condition inspected)
+   │       │
+   │       └──► [Cancelled] (Cancelled prior to handover)
+   │
+   ├──► [Rejected] (Declined by manager with note)
+   │
+   └──► [Cancelled] (Cancelled by requester while pending)
 ```
 
-Only valid state transitions should be allowed. An issued item remains unavailable until it is physically returned and the return is recorded.
+### Availability & Overlap Rules
+- Two intervals overlap when: `Request.Start < Existing.End && Request.End > Existing.Start`.
+- Adjacent bookings (e.g., `10:00 - 11:00` and `11:00 - 12:00`) do not conflict.
+- Only confirmed states (`Approved` and `Issued`) consume inventory capacity.
+- `Pending` requests do not lock capacity until approved; manager approvals atomically re-validate remaining capacity.
+- Overdue items remain in `Issued` status and continue consuming capacity until explicitly marked as returned.
 
-## Important availability rules
+---
 
-- Two time ranges overlap when `A.start < B.end && A.end > B.start`.
-- Adjacent bookings (where one ends exactly when another starts) do not overlap.
-- Pending requests do not consume confirmed inventory capacity.
-- Approved and Issued bookings count against capacity during overlapping periods.
-- Availability must be checked again when a manager approves a request.
-- Availability is calculated from booking records rather than maintained as a manually edited counter.
-- An overdue item is not considered returned automatically; it remains issued until a return is recorded.
+## 🎨 Useful Screens & Design References
 
-## Planned technology stack
+### Recommended Screens to Study
+1. **Resource Catalogue:** Grid and list views with search, category chips, location filter, and real-time availability badges.
+2. **Availability Calendar:** Interactive timeline / Gantt view showing resource allocation across hours and days.
+3. **Booking Form:** Date/time range picker, quantity selector, purpose field, and instant validation feedback.
+4. **Booking Approval Queue:** Manager review list with conflict warnings, requester info, and single-click approve/reject actions.
+5. **Equipment Inventory:** Asset table showing total stock, active issues, maintenance status, and quick actions.
+6. **Return & Handover Desk:** Quick lookup screen to scan/enter booking references, record return condition, and check in gear.
+7. **Booking History & Analytics:** Recharts-powered graphs and summary cards for inventory utilization.
 
-| Layer | Technology |
-| --- | --- |
-| Web application | Next.js App Router |
-| Language | TypeScript |
-| UI styling | Tailwind CSS |
-| API | Next.js Route Handlers |
-| Database | MongoDB Atlas |
-| Data modelling | Mongoose |
-| Validation | Zod |
-| Forms | React Hook Form |
-| Charts | Recharts |
-| Icons | Lucide React |
-| Date utilities | date-fns |
-| Deployment target | Vercel |
+### Industry & Design References
+- [Cheqroom — Equipment booking and asset management](https://www.cheqroom.com/)
+- [Skedda — Space and resource booking](https://www.skedda.com/)
+- [Dribbble — Booking calendar dashboard designs](https://dribbble.com/search/booking-calendar-dashboard)
+- [Dribbble — Room and resource booking UI designs](https://dribbble.com/search/room-booking)
+- [Behance — Equipment booking system UI designs](https://www.behance.net/search/projects/equipment%20booking%20system)
 
-Dependencies and implementation details may evolve as development progresses.
+---
 
-## Data model overview
+## 🛠️ Planned Technology Stack
 
-The initial domain model is expected to include:
+| Layer | Technology | Purpose |
+| --- | --- | --- |
+| **Framework** | Next.js 15 (App Router) | Full-stack React framework with SSR and Route Handlers |
+| **Language** | TypeScript | Type safety across client and server |
+| **Styling** | Tailwind CSS | Utility-first responsive design system |
+| **Database** | MongoDB Atlas | Document database for flexible resource schemas |
+| **ODM** | Mongoose | Schema modeling, indexes, and transaction support |
+| **Validation** | Zod | Runtime schema validation for forms and API routes |
+| **Forms** | React Hook Form | Controlled, performant form state management |
+| **Visualizations** | Recharts | Analytics dashboards and utilization graphs |
+| **Icons** | Lucide React | Consistent iconography |
+| **Date Utilities** | date-fns | Interval overlap calculations and date formatting |
+| **Deployment** | Vercel | Production hosting and edge optimizations |
 
-### Resource
-Stores the resource name, description, category, location, total quantity, active status, usage instructions, and timestamps.
+---
 
-### Booking
-Stores the booking reference, resource, requester details, department, purpose, quantity, requested start/end times, status, manager note, and issue/return timestamps and condition.
+## 🗄️ Domain Data Model Overview
 
-### ActivityLog
-Records important actions, the affected booking/resource, actor information, a description, and relevant metadata.
+### `Resource`
+```typescript
+{
+  name: string;
+  description: string;
+  category: "Electronics" | "Lab Equipment" | "Meeting Rooms" | "Sports" | "Audio/Visual" | "Other";
+  images: string[];
+  location: string;
+  totalQuantity: number;
+  isActive: boolean;
+  instructions?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
 
-Historical records should be preserved. Resources with booking history should generally be deactivated rather than hard-deleted.
+### `Booking`
+```typescript
+{
+  bookingReference: string; // e.g. "RES-2026-9842"
+  resourceId: ObjectId;
+  requester: {
+    name: string;
+    email: string;
+    department?: string;
+    role?: string;
+  };
+  purpose: string;
+  quantity: number;
+  startDate: Date;
+  endDate: Date;
+  status: "Pending" | "Approved" | "Rejected" | "Cancelled" | "Issued" | "Completed";
+  managerNote?: string;
+  issuedAt?: Date;
+  returnedAt?: Date;
+  returnCondition?: "Good" | "Fair" | "Damaged" | "Maintenance Required";
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
 
-## Recommended project structure
+### `ActivityLog`
+```typescript
+{
+  action: "CREATED" | "APPROVED" | "REJECTED" | "CANCELLED" | "ISSUED" | "RETURNED" | "UPDATED";
+  entityType: "RESOURCE" | "BOOKING";
+  entityId: ObjectId;
+  actor: string;
+  notes?: string;
+  timestamp: Date;
+}
+```
 
-ReserveX uses a feature-oriented structure inside the Next.js App Router. Route files stay focused on page composition and HTTP handling; reusable UI, business logic, database models, and validation are kept in separate modules.
+---
+
+## 📂 Target Project Structure
 
 ```text
 ReserveX/
@@ -98,27 +230,27 @@ ReserveX/
 │   ├── app/
 │   │   ├── (platform)/
 │   │   │   ├── dashboard/
-│   │   │   │   └── page.tsx
+│   │   │   │   └── page.tsx           # Manager overview & KPI metrics
 │   │   │   ├── resources/
-│   │   │   │   ├── page.tsx
+│   │   │   │   ├── page.tsx           # Resource catalogue & search
 │   │   │   │   └── [resourceId]/
-│   │   │   │       └── page.tsx
+│   │   │   │       └── page.tsx       # Resource details & booking request form
 │   │   │   ├── bookings/
-│   │   │   │   ├── page.tsx
+│   │   │   │   ├── page.tsx           # User's bookings & status tracking
 │   │   │   │   └── [bookingId]/
-│   │   │   │       └── page.tsx
+│   │   │   │       └── page.tsx       # Booking confirmation & details
 │   │   │   ├── requests/
-│   │   │   │   └── page.tsx
+│   │   │   │   └── page.tsx           # Manager approval queue & decisions
 │   │   │   ├── calendar/
-│   │   │   │   └── page.tsx
+│   │   │   │   └── page.tsx           # Visual availability calendar / timeline
 │   │   │   ├── inventory/
-│   │   │   │   └── page.tsx
+│   │   │   │   └── page.tsx           # Inventory management (CRUD)
 │   │   │   ├── issue-return/
-│   │   │   │   └── page.tsx
+│   │   │   │   └── page.tsx           # Handover & return check-in desk
 │   │   │   ├── analytics/
-│   │   │   │   └── page.tsx
+│   │   │   │   └── page.tsx           # Utilization reports & statistics
 │   │   │   ├── activity/
-│   │   │   │   └── page.tsx
+│   │   │   │   └── page.tsx           # Historical audit log
 │   │   │   └── layout.tsx
 │   │   ├── api/
 │   │   │   ├── resources/
@@ -131,39 +263,30 @@ ReserveX/
 │   │   │   │   ├── route.ts
 │   │   │   │   └── [bookingId]/
 │   │   │   │       ├── route.ts
-│   │   │   │       ├── approve/
-│   │   │   │       │   └── route.ts
-│   │   │   │       ├── reject/
-│   │   │   │       │   └── route.ts
-│   │   │   │       ├── cancel/
-│   │   │   │       │   └── route.ts
-│   │   │   │       ├── issue/
-│   │   │   │       │   └── route.ts
-│   │   │   │       └── return/
-│   │   │   │           └── route.ts
-│   │   │   ├── dashboard/
-│   │   │   │   └── route.ts
-│   │   │   ├── analytics/
-│   │   │   │   └── route.ts
-│   │   │   └── activity/
-│   │   │       └── route.ts
+│   │   │   │       ├── approve/route.ts
+│   │   │   │       ├── reject/route.ts
+│   │   │   │       ├── cancel/route.ts
+│   │   │   │       ├── issue/route.ts
+│   │   │   │       └── return/route.ts
+│   │   │   ├── dashboard/route.ts
+│   │   │   └── analytics/route.ts
 │   │   ├── globals.css
 │   │   ├── layout.tsx
 │   │   └── page.tsx
 │   ├── components/
-│   │   ├── ui/
-│   │   ├── layout/
-│   │   ├── resources/
-│   │   ├── bookings/
-│   │   ├── inventory/
-│   │   ├── dashboard/
-│   │   └── shared/
+│   │   ├── ui/                        # Buttons, inputs, modals, badges, dropdowns
+│   │   ├── layout/                    # Header, sidebar, shell
+│   │   ├── resources/                 # Resource card, catalogue filters, search bar
+│   │   ├── bookings/                  # Booking timeline, form, status badge
+│   │   ├── inventory/                 # Inventory table, add/edit modal
+│   │   ├── dashboard/                 # Metric cards, overdue alert banner
+│   │   └── shared/                    # Empty states, confirmation dialogs
 │   ├── lib/
 │   │   ├── db/
-│   │   │   └── mongoose.ts
-│   │   ├── utils.ts
-│   │   ├── constants.ts
-│   │   └── date-time.ts
+│   │   │   └── mongoose.ts            # Cached Mongoose connection helper
+│   │   ├── utils.ts                   # Class merge (clsx/twMerge) & helpers
+│   │   ├── constants.ts               # Categories, statuses, config values
+│   │   └── date-time.ts               # Overlap logic & date formatters
 │   ├── models/
 │   │   ├── Resource.ts
 │   │   ├── Booking.ts
@@ -182,127 +305,76 @@ ReserveX/
 │   │   ├── booking.ts
 │   │   └── api.ts
 │   └── hooks/
+│       ├── useAvailability.ts
+│       └── useBookings.ts
 ├── tests/
 │   ├── unit/
 │   └── integration/
 ├── .env.example
-├── .env.local                 # local only; never commit
 ├── .gitignore
-├── next.config.ts
 ├── package.json
 ├── tsconfig.json
 └── README.md
 ```
 
-### Folder responsibilities
+---
 
-| Folder | Responsibility |
-| --- | --- |
-| `src/app/` | App Router pages, layouts, loading/error UI, and Route Handlers |
-| `src/app/api/` | HTTP request parsing, validation, service invocation, and response mapping |
-| `src/components/` | Reusable UI grouped by shared purpose or product feature |
-| `src/lib/db/` | Mongoose connection setup and database infrastructure |
-| `src/models/` | Mongoose schemas and model definitions |
-| `src/services/` | Booking rules, availability calculations, inventory operations, and business workflows |
-| `src/validations/` | Zod schemas for validating incoming data |
-| `src/types/` | Shared TypeScript domain and API types |
-| `src/hooks/` | Reusable client-side React hooks |
-| `tests/` | Unit and integration tests for critical workflows |
-| `public/` | Static assets served directly by Next.js |
-
-### Architecture rules
-
-- Keep business rules out of React components and Route Handler files; put them in `services/`.
-- Route Handlers should validate input, call a service, and return a consistent HTTP response.
-- Keep database access in models and service-layer operations; do not connect to MongoDB from client components.
-- Use `server-only` for modules that must never enter the client bundle, especially database and secret-dependent code.
-- Use Zod schemas at API boundaries and infer TypeScript types where practical.
-- Keep resource availability derived from overlapping Approved and Issued bookings; do not store a manually maintained available-quantity value.
-- Use MongoDB transactions for approval operations that must atomically recheck capacity, update the booking, and write an activity log. Configure Atlas as a replica set.
-- Add folders and files as the corresponding milestone is implemented. This is the target structure, not a claim that every file already exists in the repository.
-
-## Getting started
+## 🚦 Getting Started
 
 ### Prerequisites
-
-- Node.js 20 or later
-- npm
-- A MongoDB Atlas database
-- Git
+- **Node.js**: v20 or later
+- **npm** or **pnpm**
+- **MongoDB Atlas** cluster or local MongoDB instance
+- **Git**
 
 ### Installation
 
-Clone the repository:
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/TrikamDevasi/ReserveX.git
+   cd ReserveX
+   ```
 
-```bash
-git clone https://github.com/TrikamDevasi/ReserveX.git
-cd ReserveX
-```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-Install dependencies:
+3. **Configure environment variables:**
+   Create a `.env.local` file in the root directory:
+   ```env
+   MONGODB_URI=your_mongodb_connection_string
+   NEXT_PUBLIC_APP_URL=http://localhost:3000
+   ```
 
-```bash
-npm install
-```
+4. **Run the local development server:**
+   ```bash
+   npm run dev
+   ```
 
-Create a local environment file named `.env.local`:
-
-```env
-MONGODB_URI=your_mongodb_atlas_connection_string
-```
-
-Do not commit real credentials or secrets to Git.
-
-Start the development server:
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-> The commands above assume the Next.js application and its dependencies have been added to this repository. The repository README does not imply that the application source code has already been pushed.
-
-## Development roadmap
-
-- [ ] Initialize the Next.js TypeScript App Router project
-- [ ] Configure MongoDB Atlas and Mongoose
-- [ ] Implement database connection handling and domain models
-- [ ] Build resource catalogue and resource details
-- [ ] Implement availability calculation
-- [ ] Implement booking creation and validation
-- [ ] Implement manager approval/rejection and capacity rechecks
-- [ ] Implement issue and return workflows
-- [ ] Add activity history
-- [ ] Build responsive overview and analytics
-- [ ] Add automated tests for booking overlap and status transitions
-- [ ] Deploy the application
-
-## Security and scope
-
-Authentication and authorization are not part of the initial assignment scope. Any role selector used during demonstrations is a **demo convenience only** and must not be treated as real access control.
-
-MongoDB credentials must remain in environment variables. Production deployments should add proper authentication, authorization, input validation, rate limiting, and secure audit controls before being used with real campus data.
-
-## UI direction
-
-The interface is intended to feel like a practical campus operations product:
-
-- Responsive layouts for desktop, tablet, and mobile
-- Clear navigation and task-focused screens
-- Accessible forms, readable tables, and visible interaction states
-- Restrained neutral surfaces with a consistent green accent
-- Explicit loading, empty, error, disabled, and success states
-
-## Academic context
-
-ReserveX is being developed as a B.Tech Semester 3 Next.js project. The project brief is based on the [Semester 3 Next.js portfolio project assignment](https://github.com/codinggita/CGxSU_Semester_1/blob/main/Semester_3/NextJS/nextjs-portfolio-project.md).
-
-## Author
-
-**Trikam Devasi**  
-GitHub: [@TrikamDevasi](https://github.com/TrikamDevasi)
+5. **Open in browser:**
+   Navigate to [http://localhost:3000](http://localhost:3000).
 
 ---
 
-Built as an academic project to practise full-stack application development, database modelling, API design, and reliable booking workflows.
+## 🗺️ Implementation Roadmap
+
+- [ ] Project initialization with Next.js App Router & Tailwind CSS
+- [ ] MongoDB Atlas connection and Mongoose schemas (`Resource`, `Booking`, `ActivityLog`)
+- [ ] Resource catalogue with search, category filtering, and location filters
+- [ ] Availability check algorithm (preventing overlapping over-capacity bookings)
+- [ ] Booking request form with validation and unique reference generation
+- [ ] Manager approval workflow (capacity recheck, approve/reject with notes)
+- [ ] Equipment issue & return check-in desk with condition recording
+- [ ] Overdue items tracking and alert indicators
+- [ ] Interactive availability calendar & timeline view
+- [ ] Dashboard metrics & analytics graphs (total/booked/available, utilization rates)
+- [ ] Unit & integration tests for overlap detection and state transitions
+
+---
+
+## 👤 Author
+
+**Trikam Devasi**  
+- GitHub: [@TrikamDevasi](https://github.com/TrikamDevasi)  
+- College Project: B.Tech Semester 3 — Next.js Portfolio Project
